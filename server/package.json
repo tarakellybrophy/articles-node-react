@@ -1,0 +1,31 @@
+{
+  "name": "rest-api",
+  "version": "1.0.0",
+  "description": "A REST API for a database of articles",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "server": "cross-env DEBUG=rest-api:* nodemon src/server.js",
+    "keys": "node src/createKeys.js",
+    "connect": "node src/connect.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "John Dempsey",
+  "license": "ISC",
+  "dependencies": {
+    "base64url": "^3.0.1",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "debug": "^4.3.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.11.17",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.7",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "rotating-file-stream": "^2.1.5"
+  }
+}
