@@ -6,33 +6,35 @@ const login = async function(req, res, next) {
     try {
         await connectDB();
         const user = await User.findByLogin(req.body.username);
-        if (!user) {
+        if (user === null) {
             res.status(401).json({ 
                 success: false, 
                 msg: "Invalid username/password" 
             });
         }
-        const isValid = passwordVerify(req.body.password, user.hash, user.salt);       
-        if (isValid) {
-            const tokenObject = issueJWT(user);
-            res.status(200).json({ 
-                success: true, 
-                user: user, 
-                token: tokenObject.token, 
-                expiresIn: tokenObject.expires 
-            });
-        } 
-        else {
-            res.status(401).json({ 
-                success: false, 
-                msg: "Invalid username/password" 
-            });
+        else if (user !== null) {
+            const isValid = passwordVerify(req.body.password, user.hash, user.salt);       
+            if (isValid) {
+                const tokenObject = issueJWT(user);
+                res.status(200).json({ 
+                    success: true, 
+                    user: user, 
+                    token: tokenObject.token, 
+                    expiresIn: tokenObject.expires 
+                });
+            } 
+            else {
+                res.status(401).json({ 
+                    success: false, 
+                    msg: "Invalid username/password" 
+                });
+            }
         }
     }
     catch (error) {
-        res.json({ 
+        res.status(500).json({ 
             success: false, 
-            msg: error 
+            msg: "Internal error - " + error.message 
         });
     }
 };
@@ -68,9 +70,9 @@ const register = async function(req, res, next){
         }
     }
     catch (error) {
-        res.json({ 
+        res.status(500).json({ 
             success: false, 
-            msg: error 
+            msg: "Internal error - " + error.message 
         });
     }
 };

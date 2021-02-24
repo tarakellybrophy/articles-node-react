@@ -1,13 +1,18 @@
 import mongoose from 'mongoose';
 
-const userSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        unique: true
+const userSchema = new mongoose.Schema(
+    {
+        username: {
+            type: String,
+            unique: true
+        },
+        hash: String,
+        salt: String
     },
-    hash: String,
-    salt: String
-});
+    {
+        timestamps: true
+    }
+);
 
 userSchema.statics.findByLogin = async function (login) {
     let user = await this.findOne({

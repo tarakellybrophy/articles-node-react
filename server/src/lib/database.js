@@ -28,10 +28,6 @@ const connectDB = async () => {
         }
         const client = await mongoose.connect(dbString, dbOptions);
         db = client.connection; 
-        
-        mongoose.connection.on('connected', () => {
-            debug('Database connected');
-        });
     }
     catch (error) {
         debug("Error connecting to database: " + error);

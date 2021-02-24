@@ -17,6 +17,7 @@ const dbConfig = {
     username: process.env.MONGO_DB_USERNAME,
     password: process.env.MONGO_DB_PASSWORD
 };
+
 const logConfig = {
   file: process.env.REQUEST_LOG_FILE,
   format: process.env.REQUEST_LOG_FORMAT

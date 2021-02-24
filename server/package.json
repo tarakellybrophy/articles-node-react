@@ -6,7 +6,9 @@
   "main": "server.js",
   "scripts": {
     "server": "cross-env DEBUG=rest-api:* nodemon src/server.js",
+    "debug": "cross-env DEBUG=rest-api:* nodemon --inspect src/server.js",
     "keys": "node src/createKeys.js",
+    "seed": "node src/seed.js",
     "connect": "node src/connect.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
