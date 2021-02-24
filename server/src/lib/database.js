@@ -3,6 +3,12 @@ import { default as createDebug } from 'debug';
 
 import { dbConfig } from './config.js';
 
+import Tag from '../models/Tag.js';
+import Category from '../models/Category.js';
+import User from '../models/User.js';
+import Image from '../models/Image.js';
+import Comment from '../models/Comment.js';
+
 const debug = createDebug('rest-api:debug');
 
 const dbString = 

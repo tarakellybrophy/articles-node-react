@@ -1,10 +1,8 @@
 import { passwordVerify, passwordHash, issueJWT } from '../lib/utils.js';
-import connectDB from '../lib/database.js';
 import User from '../models/User.js';
 
 const login = async function(req, res, next) {
     try {
-        await connectDB();
         const user = await User.findByLogin(req.body.username);
         if (user === null) {
             res.status(401).json({ 
@@ -45,7 +43,6 @@ const register = async function(req, res, next){
         const salt = saltHash.salt;
         const hash = saltHash.hash;
 
-        await connectDB();
         const oldUser = await User.findByLogin(req.body.username);
         if (oldUser) {
             res.status(401).json({ 

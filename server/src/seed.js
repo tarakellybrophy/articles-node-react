@@ -43,7 +43,7 @@ try {
         "Unbranded",
         "Tasty"
     ];
-        for (let i = 0; i != tags.length; i++) {
+    for (let i = 0; i != tags.length; i++) {
         const tag = new Tag();
         tag.title = tags[i];
         tag.save();

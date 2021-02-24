@@ -6,6 +6,7 @@ import accessFileLogger from './middleware/logger.js';
 import jwtStrategy from './middleware/passport.js';
 import { port } from './lib/config.js';
 import router from './routes/index.js'
+import connectDB from './lib/database.js';
 
 const app = express();
 app.use(express.json());
@@ -17,6 +18,8 @@ passport.use(jwtStrategy());
 app.use(passport.initialize());
 
 app.use(router);
+
+await connectDB();
 
 app.listen(port, () => {
     console.log('Example app listening on port 3000!');

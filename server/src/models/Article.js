@@ -36,7 +36,7 @@ const articleSchema = new Schema(
         }]
     },
     {
-    timestamps: true
+        timestamps: true
     }
 );
 
