@@ -1,9 +1,4 @@
-import Joi from 'joi';
-
 import Article from '../models/Article.js';
-import User from '../models/User.js';
-import Category from '../models/Category.js';
-import Tag from '../models/Tag.js';
 import Image from '../models/Image.js';
 
 const index = async function(req, res, next) {
@@ -14,12 +9,11 @@ const index = async function(req, res, next) {
                                       .populate('author')
                                       .populate('image')
                                       .exec();
-        res.json(articles);
+        res.status(200).json(articles);
     }
     catch(error) {
         res.status(500).json({
-            success: false,
-            message: error.message
+            error: error.message
         });
     }
 };
@@ -40,11 +34,11 @@ const show = async function(req, res, next) {
         if (article === null) {
             res.status(404).json({
                 success: false,
-                message: "article not found"
+                message: "Article not found"
             });
         }
         else {
-            res.json(article);
+            res.status(200).json(article);
         }
     }
     catch(error) {
@@ -57,58 +51,84 @@ const show = async function(req, res, next) {
 };
 
 const store = async function (req, res, next) {
-    const article = req.body;
+    try {
+        const article = req.body;
 
-    const schema = Joi.object({
-        title: Joi.string().required(),
-        body: Joi.string().required(),
-        author: Joi.string().pattern(new RegExp('^[0-9a-fA-F]{24}$')).required(),
-        category: Joi.string().pattern(new RegExp('^[0-9a-fA-F]{24}$')).required(),
-        tags: Joi.array().items(Joi.string().pattern(new RegExp('^[0-9a-fA-F]{24}$'))).required()
-    });
-    const { error } = schema.validate(article, { abortEarly: false } );
-    if (error !== undefined) {
-        const errors = error.details.map(error => error.message);
-        res.status(422).json({
-            success: false,
-            errors: errors
-        });
+        const image = new Image();
+        image.path = "http://placeimg.com/640/480/nature";
+        await image.save();
+    
+        const newArticle = new Article(article);
+        newArticle.comments = [];
+        newArticle.image = image._id;
+        await newArticle.save();
+    
+        res.status(201).json(newArticle);
     }
-    else {
-        const errors = [];
-        if (!await User.exists({_id: article.author})) {
-            errors.push("Invalid author: " + article.author);
-        }
-        if (!await Category.exists({_id: article.category})) {
-            errors.push("Invalid category: " + article.category);
-        }
-        for (let i = 0; i !== article.tags.length; i++) {
-            let tag = article.tags[i];
-            if (!await Tag.exists({_id: tag})) {
-                errors.push("Invalid tag: " + tag);
-            }
-        }        console.log(errors);
-        if (errors.length !== 0) {
-            res.status(422).json({
-                success: false,
-                errors: errors
-            });
-        }
-        else {
-            const image = new Image();
-            image.path = "http://placeimg.com/640/480/nature";
-            image.save();
-
-            const newArticle = new Article(article);
-            newArticle.image = image._id;
-            newArticle.save();
-
-            res.json({ 
-                success: true,
-                article: newArticle
-            });
-        }
+    catch(error) {
+        res.status(500).json({
+            error: error.message
+        });
     }
 };
 
-export { index, show, store };
+const update = async function(req, res, next) {
+    try {
+        const article = await Article.findById(req.params.id)
+                                     .exec();
+
+        if (article === null) {
+            res.status(404).json({
+                success: false,
+                message: "Article not found"
+            });
+        }
+        else {
+            article.title = req.body.title;
+            article.body = req.body.body;
+            article.category = req.body.category;
+            article.tags = req.body.tags;
+            await article.save();
+        
+            res.status(200).json(article);
+        }
+    }
+    catch(error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+const remove = async function(req, res, next) {
+    try {
+        const article = await Article.findById(req.params.id)
+                                     .exec();
+
+        if (article === null) {
+            res.status(404).json({
+                success: false,
+                message: "Article not found"
+            });
+        }
+        else {
+            article.title = req.body.title;
+            article.body = req.body.body;
+            article.category = req.body.category;
+            article.tags = req.body.tags;
+            await article.remove();
+        
+            res.status(204).json(null);
+        }
+    }
+    catch(error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+export { index, show, store, update, remove };
