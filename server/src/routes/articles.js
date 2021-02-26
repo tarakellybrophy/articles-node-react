@@ -34,6 +34,10 @@ articlesRouter.put('/:id',
     update
 );
 
-articlesRouter.delete('/:id', validateArticleId, remove);
+articlesRouter.delete('/:id', 
+    passport.authenticate('jwt', { session: false }), 
+    validateArticleId, 
+    remove
+);
 
 export default articlesRouter;

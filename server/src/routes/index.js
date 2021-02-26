@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import passport from 'passport';
 import authRouter from './auth.js';
 import articlesRouter from './articles.js';
 

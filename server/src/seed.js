@@ -46,7 +46,7 @@ try {
     for (let i = 0; i != tags.length; i++) {
         const tag = new Tag();
         tag.title = tags[i];
-        tag.save();
+        await tag.save();
     }
     
     const categories = [
@@ -76,7 +76,7 @@ try {
     for (let i = 0; i != categories.length; i++) {
         const category = new Category();
         category.title = categories[i];
-        category.save();
+        await category.save();
     }
     
     for (let i = 0; i !== numberOfUsers; i++) {
@@ -108,7 +108,7 @@ try {
             random = Math.floor(Math.random() * numberOfUsers);
             const commentAuthor = await User.findOne().skip(random).exec();
             const comment = new Comment();
-            comment.body = faker.lorem.sentences()
+            comment.body = faker.lorem.sentences();
             comment.author = commentAuthor._id;
             await comment.save();
             comments.push(comment._id);

@@ -42,7 +42,6 @@ const show = async function(req, res, next) {
         }
     }
     catch(error) {
-        console.log(error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -113,10 +112,6 @@ const remove = async function(req, res, next) {
             });
         }
         else {
-            article.title = req.body.title;
-            article.body = req.body.body;
-            article.category = req.body.category;
-            article.tags = req.body.tags;
             await article.remove();
         
             res.status(204).json(null);

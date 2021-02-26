@@ -16,7 +16,7 @@ Validator.registerAsync('exists', function(value,  attribute, req, passes) {
     //check if the value can be cast to a MongoDB ObjectId
     const regex = /^[0-9a-fA-F]{24}$/;
 
-    if(!value.match(regex)){
+    if (!value.match(regex)){
         passes(false, `Invalid format`);
         return;
     }
@@ -30,8 +30,7 @@ Validator.registerAsync('exists', function(value,  attribute, req, passes) {
             return;
         }
         passes();
-    })
-
+    });
 });
 
 const validator = (body, rules, customMessages, callback) => {
