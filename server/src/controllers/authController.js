@@ -16,7 +16,11 @@ const login = async function(req, res, next) {
                 const tokenObject = issueJWT(user);
                 res.status(200).json({ 
                     success: true, 
-                    user: user, 
+                    user: {
+                        _id: user._id,
+                        username: user.username
+
+                    }, 
                     token: tokenObject.token, 
                     expiresIn: tokenObject.expires 
                 });
