@@ -21,7 +21,7 @@ const Home = () => {
         };
     }, [authState.token]);
 
-    const { loading, error, data = [] } = useFetch('http://localhost:8000/articles', headers);
+    const { loading, error, data } = useFetch('http://localhost:8000/articles', headers);
 
     const { path } = useRouteMatch();
 
