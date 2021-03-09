@@ -35,7 +35,7 @@ const Header = () => {
                 
                 {user !== null &&
                 <Nav.Item>
-                    <Nav.Link as={Link} to="/home">Home</Nav.Link>
+                    <Nav.Link as={Link} to="/articles">Home</Nav.Link>
                 </Nav.Item>}
 
                 {user !== null &&

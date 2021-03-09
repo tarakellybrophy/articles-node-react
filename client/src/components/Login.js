@@ -71,7 +71,7 @@ const Login = () => {
                         token: response.token
                     }
                 });
-                history.push("/home");
+                history.push("/articles");
             }
         })
         .catch(error => {

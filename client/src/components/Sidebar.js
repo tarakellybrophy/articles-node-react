@@ -1,12 +1,15 @@
 import React from 'react';
-import { ListGroup, Pagination } from 'react-bootstrap';
+import { ListGroup, Pagination, Nav } from 'react-bootstrap';
+import { Link, useRouteMatch } from 'react-router-dom';
+import { ArticlesContext } from './Home';
 
 const pageSize = 10;
 
-const Sidebar = (props) => {
+const Sidebar = () => {
     const [page, setPage] = React.useState(1);
-
-    const articles = props.articles;
+    const { url } = useRouteMatch();
+    const { articles } = React.useContext(ArticlesContext);
+    
     const numPages = Math.floor(articles.length/pageSize)
 
     const firstPage = 1;
@@ -18,13 +21,6 @@ const Sidebar = (props) => {
     const start = (currentPage-1) * pageSize;
     const articlesToDisplay = articles.slice(start, start + pageSize);
 
-    const showArticle = (index) => {
-        props.dispatch({
-            type: "ARTICLE_SELECTED",
-            payload: (start + index)
-        });
-    }
-    
     return (
         <>
             <Pagination className="justify-content-center">
@@ -46,11 +42,22 @@ const Sidebar = (props) => {
             </Pagination>
             <ListGroup>
                 {articlesToDisplay.map((article, index) => (
-                    <ListGroup.Item key={article._id} onClick={(e) => showArticle(index)}>
-                        {article.title}
+                    <ListGroup.Item key={article._id}>
+                        <Link to={`${url}/${article._id}`}>
+                                {article.title}
+                        </Link>
                     </ListGroup.Item>
                 ))}
             </ListGroup>
+            <Nav.Item>
+                <Nav.Link 
+                    className="btn btn-outline-primary mt-3" 
+                    as={Link} 
+                    to="/articles/create"
+                >
+                    Create new article
+                </Nav.Link>
+            </Nav.Item>
         </>
     );
 };

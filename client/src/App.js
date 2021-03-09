@@ -57,7 +57,7 @@ function App() {
                 <Switch>
                     <Route exact path="/" component={Welcome} />
                     <Route path="/login" component={Login} />
-                    <Route path="/home" component={Home} />
+                    <Route path="/articles" component={Home} />
                 </Switch>
                 <Footer />
             </Container>
