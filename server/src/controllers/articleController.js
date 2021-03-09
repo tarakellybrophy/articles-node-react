@@ -88,8 +88,15 @@ const update = async function(req, res, next) {
             article.category = req.body.category;
             article.tags = req.body.tags;
             await article.save();
+
+            const upDatedArticle = await Article.findById(req.params.id)
+                                         .populate('tags')
+                                         .populate('category')
+                                         .populate('author')
+                                         .populate('image')
+                                         .exec();
         
-            res.status(200).json(article);
+            res.status(200).json(upDatedArticle);
         }
     }
     catch(error) {
