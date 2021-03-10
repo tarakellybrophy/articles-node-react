@@ -3,30 +3,83 @@ import { Redirect } from 'react-router-dom';
 import { Link, useParams, useRouteMatch } from 'react-router-dom';
 import { Nav, Navbar } from 'react-bootstrap';
 import { AuthContext } from '../../App';
-import useFetch from '../../hooks/useFetch';
+import DeleteModal from './DeleteModal';
+
+const initialState = {
+    article: null,
+    isFetching: false,
+    hasError: false
+};
+
+const reducer = (state, action) => {
+    console.log(action);
+    switch (action.type) {
+        case "FETCH_ARTICLE_REQUEST": {
+            return {
+                ...state,
+                isFetching: true,
+                hasError: false
+            };
+        }
+        case "FETCH_ARTICLE_SUCCESS": {
+            return {
+                ...state,
+                isFetching: false,
+                article: action.payload
+            };
+        }
+        case "FETCH_ARTICLE_FAILURE": {
+            return {
+                ...state,
+                isFetching: false,
+                hasError: true
+            };
+        }
+        default: {
+            return state;
+        }
+    }
+};
 
 const Show = () => {
-    
     const { id } = useParams();
-    const { state: authState } = React.useContext(AuthContext);
-    const headers = React.useMemo(() =>  {
-        return {
-            headers: {
-                Authorization: `Bearer ${authState.token}`
-            }
-        };
-    }, [authState.token]);
 
-    const { loading, error, data = [] } = useFetch(`http://localhost:8000/articles/${id}`, headers);
+    const authContext = React.useContext(AuthContext);
+
+    const [state, dispatch] = React.useReducer(reducer, initialState);
+
+    React.useEffect(() => {
+        dispatch({
+            type: "FETCH_ARTICLE_REQUEST"
+        });
+
+        fetch(`http://localhost:8000/articles/${id}`, {
+            headers: {
+                Authorization: `Bearer ${authContext.state.token}`
+            }
+        })
+        .then(res => res.json())
+        .then(resJson => {
+            dispatch({
+                type: "FETCH_ARTICLE_SUCCESS",
+                payload: resJson
+            });
+        })
+        .catch(error => {
+            dispatch({
+                type: "FETCH_ARTICLE_FAILURE"
+            });
+        });
+    }, [authContext.state.token, id]);
 
     const { url } = useRouteMatch();
 
-    if (error) return <p>Error!</p>;
-    if (loading) return <p>Loading...</p>;
+    if (state.hasError) return <p>Error!</p>;
+    if (state.isFetching) return <p>Loading...</p>;
 
-    const article = data;
+    const article = state.article;
 
-    if (!authState.isAuthenticated) {
+    if (!authContext.state.isAuthenticated) {
         return <Redirect to="/login" />
     }
     
@@ -37,9 +90,9 @@ const Show = () => {
                 <h2>{article.title}</h2>
                 <h4>
                     Author: {article.author.username}
-                    {article.author._id === authState.user._id &&
+                    {article.author._id === authContext.state.user._id &&
                     <Navbar className="float-right">
-                        <Nav.Item className="ml-auto">
+                        <Nav.Item className="mr-2">
                             <Nav.Link 
                                 className="btn btn-outline-warning" 
                                 as={Link} 
@@ -49,13 +102,7 @@ const Show = () => {
                             </Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link 
-                                className="btn btn-outline-danger ml-3" 
-                                as={Link} 
-                                to={`${url}/delete`}
-                            >
-                                Delete
-                            </Nav.Link>
+                            <DeleteModal id={id} />
                         </Nav.Item>
                     </Navbar>
                     }

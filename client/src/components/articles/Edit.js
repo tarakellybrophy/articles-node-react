@@ -6,43 +6,84 @@ import { AuthContext } from '../../App';
 import { ArticlesContext } from '../Home';
 import useFetch from '../../hooks/useFetch';
 
+let initialState = {
+    title: null,
+    body: null,
+    category: null,
+    tags: [],
+    isUpdating: false,
+    hasError: false
+};
+
+const reducer = (state, action) => {
+    console.log(action);
+    switch (action.type) {
+        case "PUT_ARTICLE_REQUEST": {
+            return {
+                ...state,
+                isUpdating: true,
+                hasError: false
+            };
+        }
+        case "PUT_ARTICLE_SUCCESS": {
+            return {
+                ...state,
+                isUpdating: false,
+                article: action.payload
+            };
+        }
+        case "PUT_ARTICLE_FAILURE": {
+            return {
+                ...state,
+                isUpdating: false,
+                hasError: true
+            };
+        }
+        case "UPDATE_ARTICLE": {
+            return {
+                ...state,
+                ...action.payload
+            };
+        }
+        default: {
+            return state;
+        }
+    }
+};
+
 const Edit = () => {
 
     let history = useHistory();
     
     const { id } = useParams();
-    const { state: authState } = React.useContext(AuthContext);
+
+    const articlesContext = React.useContext(ArticlesContext);
+    const articles = articlesContext.state.articles;
+    const article = articles.find(article => article._id === id);
+    
+    initialState.title = article.title;
+    initialState.body = article.body;
+    initialState.category = article.category._id;
+    initialState.tags = article.tags.map(tag => tag._id);
+    const [state, dispatch] = React.useReducer(reducer, initialState);
+
+    const authContext = React.useContext(AuthContext);
     const headers = React.useMemo(() =>  {
         return {
             headers: {
-                Authorization: `Bearer ${authState.token}`
+                Authorization: `Bearer ${authContext.state.token}`
             }
         };
-    }, [authState.token]);
+    }, [authContext.state.token]);
 
     const getCategories = useFetch(`http://localhost:8000/categories`, headers);
     const getTags = useFetch(`http://localhost:8000/tags`, headers);
 
-    const { articles } = React.useContext(ArticlesContext);
-    const { url } = useRouteMatch();
-
-    const article = articles.find(article => article._id === id);
-    const initialState = {
-        title: article.title,
-        body: article.body,
-        category: article.category._id,
-        tags: article.tags.map(tag => tag._id),
-        isUpdating: false,
-        errorMessage: null,
-    };
-    const [state, setState] = React.useState(initialState);
-
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        setState({
-            ...state,
-            isUpdating: true
+        dispatch({
+            type: "PUT_ARTICLE_REQUEST"
         });
 
         fetch(`http://localhost:8000/articles/${id}`, {
@@ -50,7 +91,7 @@ const Edit = () => {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'Authorization': `Bearer ${authState.token}`
+                'Authorization': `Bearer ${authContext.state.token}`
             },
             body: JSON.stringify({
                 title: state.title,
@@ -61,19 +102,18 @@ const Edit = () => {
         })
         .then(res => res.json())
         .then(resJson => {
-            const updatedArticle = resJson;
-            const index = articles.findIndex(article => article._id === updatedArticle._id);
-            articles[index] = updatedArticle;
-            setState({
-                ...state,
-                isUpdating: false
+            dispatch({
+                type: "PUT_ARTICLE_SUCCESS"
             });
+            articlesContext.dispatch({
+                type: "ARTICLE_UPDATED",
+                payload: resJson
+            })
             history.push(`/articles/${id}`);
         })
         .catch(error => {
-            setState({
-                ...state,
-                errorMessage: error
+            dispatch({
+                type: "PUT_ARTICLE_FAILURE"
             });
         });
     };
@@ -82,23 +122,29 @@ const Edit = () => {
         const target = e.target;
         const field = target.name;
         const value = target.value;
-        setState({
-            ...state,
-            [field]: value
+        dispatch({
+            type: "UPDATE_ARTICLE",
+            payload: {
+                [field]: value
+            }
         });
     }
 
     const toggleTag = (e) => {
         const target = e.target;
         const id = target.id;
-        const updatedTags = 
-            state.tags.includes(id) ? 
-            state.tags.filter(tag => tag !== id) :
-            [...state.tags, id];
-
-        setState({
-            ...state,
-            tags: updatedTags
+        let updatedTags = null;
+        if (state.tags.includes(id)) {
+            updatedTags = state.tags.filter(tag => tag !== id);
+        } 
+        else {
+            updatedTags = [...state.tags, id];
+        }
+        dispatch({
+            type: "UPDATE_ARTICLE",
+            payload: {
+                tags: updatedTags
+            }
         });
     }
 
@@ -110,7 +156,7 @@ const Edit = () => {
     const categories = getCategories.data;
     const tags = getTags.data;
 
-    if (!authState.isAuthenticated) {
+    if (!authContext.state.isAuthenticated) {
         return <Redirect to="/login" />
     }
     

@@ -8,7 +8,7 @@ import { AuthContext } from '../App';
 
 const Login = () => {
 
-    const { state, dispatch } = React.useContext(AuthContext);
+    const authContext = React.useContext(AuthContext);
 
     let history = useHistory();
 
@@ -20,14 +20,14 @@ const Login = () => {
         errorMessage: null
     };
 
-    const [data, setData] = React.useState(initialState);
+    const [state, setState] = React.useState(initialState);
 
     const handleChange = (e) => {
         const target = e.target;
         const field = target.name;
         const value = (target.type === 'checkbox') ? target.checked : target.value;
-        setData({
-            ...data,
+        setState({
+            ...state,
             [field]: value
         });
     }
@@ -35,15 +35,15 @@ const Login = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        setData({
-            ...data,
+        setState({
+            ...state,
             isSubmitting: true,
             errorMessage: null
         });
 
         const userDetails = {
-            username: data.username,
-            password: data.password
+            username: state.username,
+            password: state.password
         };
 
         fetch('http://localhost:8000/auth/login', {
@@ -57,14 +57,14 @@ const Login = () => {
         .then(res => res.json())
         .then(response => {
             if (!response.success) {
-                setData({
-                    ...data,
+                setState({
+                    ...state,
                     isSubmitting: false,
                     errorMessage: response.msg
                 });
             }
             else {
-                dispatch({
+                authContext.dispatch({
                     type: "LOGIN",
                     payload: {
                         user: response.user,
@@ -75,15 +75,15 @@ const Login = () => {
             }
         })
         .catch(error => {
-            setData({
-                ...data,
+            setState({
+                ...state,
                 isSubmitting: false,
                 errorMessage: error.message || error.statusText
             });
         });
     }
 
-    if (state.isAuthenticated) {
+    if (authContext.state.isAuthenticated) {
         return <Redirect to="/home" />
     }
 
@@ -92,9 +92,9 @@ const Login = () => {
             <Card.Body>
                 <Card.Title>Login form</Card.Title>
                 <Form onSubmit={handleSubmit}>
-                    {data.errorMessage &&
+                    {state.errorMessage &&
                         <Alert variant="danger">
-                            {data.errorMessage}
+                            {state.errorMessage}
                         </Alert>
                     }
                     <Form.Group controlId="username">
@@ -103,7 +103,7 @@ const Login = () => {
                             required 
                             name="username"
                             type="username" 
-                            value={data.username}
+                            value={state.username}
                             onChange={handleChange} 
                         />
                     </Form.Group>
@@ -113,7 +113,7 @@ const Login = () => {
                             required
                             name="password"
                             type="password" 
-                            value={data.password}
+                            value={state.password}
                             onChange={handleChange}
                         />
                     </Form.Group>
@@ -122,11 +122,11 @@ const Login = () => {
                             type="checkbox" 
                             name="remember" 
                             label="Remember me" 
-                            checked={data.remember}
+                            checked={state.remember}
                             onChange={handleChange} 
                         />
                     </Form.Group>
-                    <Button variant="primary" type="submit" disabled={data.isSubmitting}>
+                    <Button variant="primary" type="submit" disabled={state.isSubmitting}>
                         Login
                     </Button>
                 </Form>

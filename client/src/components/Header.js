@@ -7,15 +7,15 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../App';
 
 const Header = () => {
-    const { state, dispatch } = React.useContext(AuthContext);
-    const user = state.user;
+    const authContext = React.useContext(AuthContext);
+    const user = authContext.state.user;
 
     let history = useHistory();
 
     const handleLogout = (e) => {
         e.preventDefault();
         history.push("/");
-        dispatch({type: "LOGOUT"});
+        authContext.dispatch({type: "LOGOUT"});
     };
 
     return (

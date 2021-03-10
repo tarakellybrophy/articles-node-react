@@ -8,9 +8,11 @@ const pageSize = 10;
 const Sidebar = () => {
     const [page, setPage] = React.useState(1);
     const { url } = useRouteMatch();
-    const { articles } = React.useContext(ArticlesContext);
+    const articlesContext = React.useContext(ArticlesContext);
+
+    const articles = articlesContext.state.articles;
     
-    const numPages = Math.floor(articles.length/pageSize)
+    const numPages = Math.floor(articles.length/pageSize) + 1;
 
     const firstPage = 1;
     const prevPage = (page > 1) ? page - 1 : page;

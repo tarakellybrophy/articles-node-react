@@ -62,7 +62,14 @@ const store = async function (req, res, next) {
         newArticle.image = image._id;
         await newArticle.save();
     
-        res.status(201).json(newArticle);
+        const createdArticle = await Article.findById(newArticle._id)
+                                            .populate('tags')
+                                            .populate('category')
+                                            .populate('author')
+                                            .populate('image')
+                                            .exec();
+        
+            res.status(200).json(createdArticle);
     }
     catch(error) {
         res.status(500).json({
