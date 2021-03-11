@@ -11,14 +11,11 @@ import Comment from '../models/Comment.js';
 
 const debug = createDebug('rest-api:debug');
 
-const dbString = 
-    'mongodb://' + 
-    dbConfig.username + ':' + 
-    dbConfig.password + '@' +
-    dbConfig.host + ':' + 
-    dbConfig.port + '/' + 
-    dbConfig.database +
-    '?authSource=' + dbConfig.database;
+const dbString =
+    'mongodb://' +
+    dbConfig.host + ':' +
+    dbConfig.port + '/' +
+    dbConfig.database;
 
 const dbOptions = {
     useNewUrlParser: true,
@@ -33,7 +30,7 @@ const connectDB = async () => {
             return;
         }
         const client = await mongoose.connect(dbString, dbOptions);
-        db = client.connection; 
+        db = client.connection;
     }
     catch (error) {
         debug("Error connecting to database: " + error);

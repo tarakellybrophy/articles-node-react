@@ -5,13 +5,11 @@ import { dbConfig } from './lib/config.js';
 
 const debug = createDebug('rest-api:debug');
 
-const dbString = 
-    'mongodb://' + dbConfig.username +
-    ':' + dbConfig.password + 
-    '@' + dbConfig.host + 
+const dbString =
+    'mongodb://'
+     + dbConfig.host +
     ':' + dbConfig.port +
-    '/' + dbConfig.database + 
-    '?authSource=' + dbConfig.database;
+    '/' + dbConfig.database;
 
 const dbOptions = {
     useNewUrlParser: true,
@@ -36,5 +34,5 @@ async function connect() {
       }
     }
   }
-  
+
   connect();
