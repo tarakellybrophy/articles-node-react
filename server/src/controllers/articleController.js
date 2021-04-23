@@ -1,5 +1,6 @@
 import Article from '../models/Article.js';
 import Image from '../models/Image.js';
+import Comment from '../models/Comment.js';
 
 const index = async function(req, res, next) {
     try {
@@ -140,8 +141,37 @@ const remove = async function(req, res, next) {
     }
 };
 
-const hello = async function (req,res,next) {
-  res.send('hello');
+const comment_store = async function (req,res,next) {
+  try {
+      const article = await Article.findById(req.params.id)
+                                   .exec();
+
+      if (article === null) {
+          res.status(404).json({
+              success: false,
+              message: "Article not found"
+          });
+      }
+      else {
+        const comment = new Comment();
+        comment.body = req.body.body;
+        comment.author = req.user._id;
+        await comment.save();
+
+        article.comments.push(comment._id);
+        await article.save();
+
+        comment.author = req.user;
+
+          res.status(200).json(comment);
+      }
+  }
+  catch(error) {
+      res.status(500).json({
+          success: false,
+          message: error.message
+      });
+  }
 };
 
-export { index, show, store, update, remove, hello };
+export { index, show, store, update, remove, comment_store };

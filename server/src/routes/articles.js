@@ -13,7 +13,7 @@ import {
     store,
     update,
     remove,
-    hello
+    comment_store
 } from '../controllers/articleController.js'
 
 const articlesRouter = Router();
@@ -43,6 +43,19 @@ articlesRouter.delete('/:id',
 
 articlesRouter.delete('/:id', validateArticleId, remove);
 
-articlesRouter.get('/:id/comments', hello);
+articlesRouter.post('/:id/comments',
+    passport.authenticate('jwt', { session: false }),
+    comment_store
+);
+
+// articlesRouter.put('/:id/comments/:cid',
+//     passport.authenticate('jwt', { session: false }),
+//     comment_update
+// );
+//
+// articlesRouter.delete('/:id/comments/:cid',
+//     passport.authenticate('jwt', { session: false }),
+//     comment_delete
+// );
 
 export default articlesRouter;
